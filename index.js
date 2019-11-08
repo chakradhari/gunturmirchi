@@ -362,8 +362,6 @@ function convertUSD(farmerValues) {
 
   console.log(farmersArrayConverted);
   return farmersArrayConverted;
-
-  // updateDailyArrivalsIndividualFields(farmersArrayConverted);
 }
 
 function modifyFarmerTableToUSD(farmerValues) {
