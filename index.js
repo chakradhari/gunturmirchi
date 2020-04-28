@@ -4,9 +4,10 @@ var byadgiObj = [];
 var threeFourtyOneobj = [];
 var no5Obj = [];
 var devanurObj = [];
-
+var rowsToDisplay = 6;
 var USDRate = 0;
 var rootArray = [];
+var rootArrayForCharts = [];
 
 function getUSDRate() {
   var params = {
@@ -62,7 +63,130 @@ function makeApiCall() {
     );
 }
 
-function makeApiCallForCharts() {
+function prepareChartInfo(rowsInput, inputGraphKey) {
+  var rows = rowsInput ? rowsInput : rowsToDisplay;
+  var consolidatedPrices = rootArrayForCharts.slice();
+  for (var i = 1; i <= rows; i++) {
+    var dateInfo = "";
+    var tejaIndividual = [],
+      sannamIndividual = [],
+      byadgiIndividual = [],
+      threeFourtyOneIndividual = [],
+      no5Individual = [],
+      devanurIndividual = [];
+    var tejaBuffer = 1,
+      sannamBuffer = 1,
+      byadgiBuffer = 1,
+      threeFourtyOneBuffer = 1,
+      no5Buffer = 1,
+      devanurBuffer = 1;
+
+    consolidatedPrices[consolidatedPrices.length - i].forEach(function(val, i) {
+      // For getting the date
+      if (i == 0) {
+        dataInfo = val;
+      }
+
+      // Teja Logic
+      if (i == 1 || (i > 1 && i < 5)) {
+        tejaIndividual.push(val);
+        tejaBuffer++;
+      }
+
+      if (tejaBuffer == 5) {
+        tejaIndividual.unshift(dataInfo);
+        tejaObj.unshift(tejaIndividual);
+        tejaBuffer = 1;
+      }
+
+      // Sannam Logic
+      if (i == 5 || (i > 5 && i < 9)) {
+        sannamIndividual.push(val);
+        sannamBuffer++;
+      }
+
+      if (sannamBuffer == 5) {
+        sannamIndividual.unshift(dataInfo);
+        sannamObj.unshift(sannamIndividual);
+        sannamBuffer = 1;
+      }
+
+      // Byadgi Logic
+      if (i == 9 || (i > 9 && i < 13)) {
+        byadgiIndividual.push(val);
+        byadgiBuffer++;
+      }
+
+      if (byadgiBuffer == 5) {
+        byadgiIndividual.unshift(dataInfo);
+        byadgiObj.unshift(byadgiIndividual);
+        byadgiBuffer = 1;
+      }
+
+      // 341 Logic
+      if (i == 13 || (i > 13 && i < 17)) {
+        threeFourtyOneIndividual.push(val);
+        threeFourtyOneBuffer++;
+      }
+
+      if (threeFourtyOneBuffer == 5) {
+        threeFourtyOneIndividual.unshift(dataInfo);
+        threeFourtyOneobj.unshift(threeFourtyOneIndividual);
+        threeFourtyOneBuffer = 1;
+      }
+
+      // No 5 Logic
+      if (i == 17 || (i > 17 && i < 21)) {
+        no5Individual.push(val);
+        no5Buffer++;
+      }
+
+      if (no5Buffer == 5) {
+        no5Individual.unshift(dataInfo);
+        no5Obj.unshift(no5Individual);
+        no5Buffer = 1;
+      }
+
+      // Devanur Logic
+      if (i == 21 || (i > 21 && i < 25)) {
+        devanurIndividual.push(val);
+        devanurBuffer++;
+      }
+
+      if (devanurBuffer == 5) {
+        devanurIndividual.unshift(dataInfo);
+        devanurObj.unshift(devanurIndividual);
+        devanurBuffer = 1;
+      }
+    });
+  }
+
+  if (inputGraphKey) {
+    if (inputGraphKey === "sannam") {
+      drawChart(sannamObj, "334 S4/Sannam", "sannam_graph", inputGraphKey);
+    }
+    if (inputGraphKey === "teja") {
+      drawChart(tejaObj, "Teja S17", "teja_graph", inputGraphKey);
+    }
+    if (inputGraphKey === "byadgi") {
+      drawChart(byadgiObj, "Byadgi", "byadgi_graph", inputGraphKey);
+    }
+    if (inputGraphKey === "341") {
+      drawChart(threeFourtyOneobj, "341", "341_graph", inputGraphKey);
+    }
+    if (inputGraphKey === "no5") {
+      drawChart(no5Obj, "No 5", "no5_graph", inputGraphKey);
+    }
+    if (inputGraphKey === "dd") {
+      drawChart(devanurObj, "Devanur Deluxe DD", "denvar", inputGraphKey);
+    }
+  } else {
+    initializeChart();
+  }
+}
+
+function makeApiCallForCharts(val) {
+  var rows = val ? val : rowsToDisplay;
   var params = {
     spreadsheetId: "1dwhlEIQ_H0NcAIT-SSg1sM_ZpsT2KZNUvc2fqWI9lYU",
     API_KEY: "AIzaSyBshQgbcousVir0__rUic0Bj1Ei6XYuKrE",
@@ -78,107 +202,8 @@ function makeApiCallForCharts() {
     })
     .then(
       function(response) {
-        var consolidatedPrices = response.valueRanges[0].values;
-        for (var i = 1; i <= 6; i++) {
-          var dateInfo = "";
-          var tejaIndividual = [],
-            sannamIndividual = [],
-            byadgiIndividual = [],
-            threeFourtyOneIndividual = [],
-            no5Individual = [],
-            devanurIndividual = [];
-          var tejaBuffer = 1,
-            sannamBuffer = 1,
-            byadgiBuffer = 1,
-            threeFourtyOneBuffer = 1,
-            no5Buffer = 1,
-            devanurBuffer = 1;
-
-          consolidatedPrices[consolidatedPrices.length - i].forEach(function(
-            val,
-            i
-          ) {
-            // For getting the date
-            if (i == 0) {
-              dataInfo = val;
-            }
-
-            // Teja Logic
-            if (i == 1 || (i > 1 && i < 5)) {
-              tejaIndividual.push(val);
-              tejaBuffer++;
-            }
-
-            if (tejaBuffer == 5) {
-              tejaIndividual.unshift(dataInfo);
-              tejaObj.unshift(tejaIndividual);
-              tejaBuffer = 1;
-            }
-
-            // Sannam Logic
-            if (i == 5 || (i > 5 && i < 9)) {
-              sannamIndividual.push(val);
-              sannamBuffer++;
-            }
-
-            if (sannamBuffer == 5) {
-              sannamIndividual.unshift(dataInfo);
-              sannamObj.unshift(sannamIndividual);
-              sannamBuffer = 1;
-            }
-
-            // Byadgi Logic
-            if (i == 9 || (i > 9 && i < 13)) {
-              byadgiIndividual.push(val);
-              byadgiBuffer++;
-            }
-
-            if (byadgiBuffer == 5) {
-              byadgiIndividual.unshift(dataInfo);
-              byadgiObj.unshift(byadgiIndividual);
-              byadgiBuffer = 1;
-            }
-
-            // 341 Logic
-            if (i == 13 || (i > 13 && i < 17)) {
-              threeFourtyOneIndividual.push(val);
-              threeFourtyOneBuffer++;
-            }
-
-            if (threeFourtyOneBuffer == 5) {
-              threeFourtyOneIndividual.unshift(dataInfo);
-              threeFourtyOneobj.unshift(threeFourtyOneIndividual);
-              threeFourtyOneBuffer = 1;
-            }
-
-            // No 5 Logic
-            if (i == 17 || (i > 17 && i < 21)) {
-              no5Individual.push(val);
-              no5Buffer++;
-            }
-
-            if (no5Buffer == 5) {
-              no5Individual.unshift(dataInfo);
-              no5Obj.unshift(no5Individual);
-              no5Buffer = 1;
-            }
-
-            // Devanur Logic
-            if (i == 21 || (i > 21 && i < 25)) {
-              devanurIndividual.push(val);
-              devanurBuffer++;
-            }
-
-            if (devanurBuffer == 5) {
-              devanurIndividual.unshift(dataInfo);
-              devanurObj.unshift(devanurIndividual);
-              devanurBuffer = 1;
-            }
-          });
-        }
-
-        console.log(tejaObj);
-        initializeChart();
+        rootArrayForCharts = response.valueRanges[0].values;
+        prepareChartInfo();
       },
       function(reason) {
         console.error("error: " + reason.error.message);
@@ -313,9 +338,10 @@ function drawCharts() {
   drawChart(devanurObj, "Devanur Deluxe DD", "denvar");
 }
 
-function drawChart(fields, title, id) {
+function drawChart(fields, title, id, objectToModify) {
   // Create the data table.
-  var getUpdatedInfo = getModifiedArray(fields);
+  var slicedField = fields.slice();
+  var getUpdatedInfo = getModifiedArray(slicedField);
   var data = google.visualization.arrayToDataTable(getUpdatedInfo);
 
   var options = {
@@ -327,7 +353,7 @@ function drawChart(fields, title, id) {
     width: "800",
     height: "450",
     vAxis: {
-      ticks: [5000, 7500, 10000, 12500, 15000, 17000]
+      ticks: [5000, 7500, 10000, 12500, 15000, 17000, 20000]
     },
     lineSmoothing: false,
     focusTarget: "category"
@@ -335,6 +361,30 @@ function drawChart(fields, title, id) {
 
   var chart = new google.visualization.LineChart(document.getElementById(id));
   chart.draw(data, options);
+
+  if (objectToModify) {
+    if (objectToModify === "sannam") sannamObj = [];
+    if (objectToModify === "teja") tejaObj = [];
+    if (objectToModify === "341") threeFourtyOneobj = [];
+    if (objectToModify === "no5") no5Obj = [];
+    if (objectToModify === "byadgi") byadgiObj = [];
+    if (objectToModify === "dd") devanurObj = [];
+  } else {
+    setTimeout(function() {
+      sannamObj = [];
+      tejaObj = [];
+      byadgiObj = [];
+      threeFourtyOneobj = [];
+      no5Obj = [];
+      devanurObj = [];
+    }, 1000);
+  }
+  // sannamObj = [];
+  // tejaObj = [];
+  // byadgiObj = [];
+  // threeFourtyOneobj = [];
+  // no5Obj = [];
+  // devanurObj = [];
 }
 
 function convertUSD(farmerValues) {
@@ -376,6 +426,14 @@ var farmerClicked = false;
 
 var offerClicked = false;
 
+var currentCurrencyForFarmer = "INR";
+
+var currentCurrencyForoffer = "INR";
+
+var farmerButton = document.getElementById("FarmerRateConverterButton");
+
+var offerButton = document.getElementById("OfferRateConverterButton");
+
 function modifyRatesToUSD(incomingBuffer) {
   var modifiedArray = [];
   var arrayToBeShipped = [];
@@ -402,18 +460,33 @@ function modifyRatesToUSD(incomingBuffer) {
   }
 
   if (incomingBuffer == "farmer") {
-    if (!farmerClicked) {
+    if (!farmerClicked || currentCurrencyForFarmer !== "USD") {
       modifyFarmerTableToUSD(modifiedArray.slice(0, 25));
       farmerClicked = true;
+      currentCurrencyForFarmer = "USD";
+      farmerButton.innerText = "Convert to INR";
+    } else {
+      updateDailyArrivalsIndividualFields(rootArray.slice(0, 25));
+      currentCurrencyForFarmer = "INR";
+      farmerButton.innerText = "Convert to USD";
     }
   }
   if (incomingBuffer == "offer") {
-    if (!offerClicked) {
+    if (!offerClicked || currentCurrencyForoffer !== "USD") {
       var tailoredArray = [];
       tailoredArray = modifiedArray.slice(25, 73);
       tailoredArray.unshift(modifiedArray[0]);
       modifiedOfferTableToUSD(tailoredArray);
       offerClicked = true;
+      currentCurrencyForoffer = "USD";
+      offerButton.innerText = "Convert to INR";
+    } else {
+      var tailoredArrayforINR = [];
+      tailoredArrayforINR = rootArray.slice(25, 73);
+      tailoredArrayforINR.unshift(rootArray.slice(0, 1)[0]);
+      updateDailyArrivalsIndividualFieldsStemBasis(tailoredArrayforINR);
+      currentCurrencyForoffer = "INR";
+      offerButton.innerText = "Convert to USD";
     }
   }
 }
