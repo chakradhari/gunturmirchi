@@ -25,7 +25,6 @@ function getUSDRate() {
       return response.json();
     })
     .then(function(responseJson) {
-      console.log(responseJson);
       USDRate = responseJson.USD_INR;
     });
 }
@@ -212,7 +211,7 @@ function makeApiCallForCharts(val) {
 }
 
 function updateDailyArrivalsIndividualFieldsStemBasis(fields) {
-  var dateArray = fields[0];
+  var dateArray = fields[0].slice();
 
   var index = dateArray.length - 1;
 
@@ -248,7 +247,7 @@ function updateDailyArrivalsIndividualFieldsStemBasis(fields) {
 }
 
 function updateDailyArrivalsIndividualFields(fields) {
-  var dateArray = fields[0];
+  var dateArray = fields[0].slice();
 
   var index = dateArray.length - 1;
 
@@ -379,12 +378,6 @@ function drawChart(fields, title, id, objectToModify) {
       devanurObj = [];
     }, 1000);
   }
-  // sannamObj = [];
-  // tejaObj = [];
-  // byadgiObj = [];
-  // threeFourtyOneobj = [];
-  // no5Obj = [];
-  // devanurObj = [];
 }
 
 function convertUSD(farmerValues) {
@@ -410,7 +403,6 @@ function convertUSD(farmerValues) {
     farmersArrayConverted.push(arr);
   });
 
-  console.log(farmersArrayConverted);
   return farmersArrayConverted;
 }
 
@@ -434,12 +426,14 @@ var farmerButton = document.getElementById("FarmerRateConverterButton");
 
 var offerButton = document.getElementById("OfferRateConverterButton");
 
+var modifyArrayForUSDRates = [];
 function modifyRatesToUSD(incomingBuffer) {
   var modifiedArray = [];
   var arrayToBeShipped = [];
+  var rootArrayDummy = rootArray.slice();
 
   if (!farmerClicked || !offerClicked) {
-    rootArray.forEach(function(individualArray, i) {
+    rootArrayDummy.forEach(function(individualArray, i) {
       var arr = [];
 
       if (i == 0) {
@@ -457,11 +451,12 @@ function modifyRatesToUSD(incomingBuffer) {
 
       modifiedArray.push(arr);
     });
+    modifyArrayForUSDRates = modifiedArray.slice();
   }
 
   if (incomingBuffer == "farmer") {
     if (!farmerClicked || currentCurrencyForFarmer !== "USD") {
-      modifyFarmerTableToUSD(modifiedArray.slice(0, 25));
+      modifyFarmerTableToUSD(modifyArrayForUSDRates.slice(0, 25));
       farmerClicked = true;
       currentCurrencyForFarmer = "USD";
       farmerButton.innerText = "Convert to INR";
@@ -474,16 +469,17 @@ function modifyRatesToUSD(incomingBuffer) {
   if (incomingBuffer == "offer") {
     if (!offerClicked || currentCurrencyForoffer !== "USD") {
       var tailoredArray = [];
-      tailoredArray = modifiedArray.slice(25, 73);
-      tailoredArray.unshift(modifiedArray[0]);
-      modifiedOfferTableToUSD(tailoredArray);
+      tailoredArray = modifyArrayForUSDRates.slice(25, 73);
+      tailoredArray.unshift(modifyArrayForUSDRates[0]);
+      modifiedOfferTableToUSD(tailoredArray.slice());
       offerClicked = true;
       currentCurrencyForoffer = "USD";
       offerButton.innerText = "Convert to INR";
     } else {
       var tailoredArrayforINR = [];
-      tailoredArrayforINR = rootArray.slice(25, 73);
-      tailoredArrayforINR.unshift(rootArray.slice(0, 1)[0]);
+      var rootArrayForTemp = rootArray.slice();
+      tailoredArrayforINR = rootArrayForTemp.slice(25, 73);
+      tailoredArrayforINR.unshift(rootArrayForTemp.slice(0, 1)[0]);
       updateDailyArrivalsIndividualFieldsStemBasis(tailoredArrayforINR);
       currentCurrencyForoffer = "INR";
       offerButton.innerText = "Convert to USD";
